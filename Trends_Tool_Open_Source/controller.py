@@ -55,7 +55,7 @@ class Run() :
     def __init__(self):
         self.glob = self.loadGlob()
         project = self.startup(self.glob)
-        self.data = data.Data(self, project)
+        self.data = data.Data(project)
         self.app = gui.Gui(self)
         self.gui = self.app.gui
         self.app.wxApp.MainLoop()
@@ -65,16 +65,17 @@ class Run() :
         if not os.path.isfile('.\\global'):
             with open('global', 'wb') as f :
                 pickle.dump({'projects': []}, f)
-        return pickle.load(open('global', 'wb'))
+        return pickle.load(open('global', 'rb'))
 
     def startup(self, glob):
-        print('Projects: ' + glob{'projects'})
+        print('Projects: ' + str(glob['projects']))
         print('Choose project with index in list or \'N\' for a new project')
         inp = input('Input: ')
-        while not isinstance(inp, int) and int(inp) >= len(glob{'projects'}) or lower(inp) != 'n':
+        while not isinstance(inp, int) and inp.lower() != 'n' or \
+            isinstance(inp, int) and int(inp) >= len(glob['projects']):
             print('Invalid input.')
             inp = input('Input: ')
-        if lower(inp) == 'n':
+        if inp.lower() == 'n':
             print('Please enter new project name, only letters are allowed.')
             inp = input('Input: ')
             while not inp.isalpha():
@@ -82,10 +83,10 @@ class Run() :
                 inp = input('Input: ')
             self.newProject(inp)
             return inp
-        return glob{'projects'}[int(inp)]
+        return glob['projects'][int(inp)]
 
     def newProject(self, name):
-        self.glob{'projects'}.append(name)
+        self.glob['projects'].append(name)
 
     def get(self, *args, **kwargs) :
         if len(args) > 0 :
